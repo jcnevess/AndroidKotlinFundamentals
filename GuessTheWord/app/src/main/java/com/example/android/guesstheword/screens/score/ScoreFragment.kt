@@ -60,9 +60,12 @@ class ScoreFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)
                 .get(ScoreViewModel::class.java)
 
-        viewModel.score.observe(this.viewLifecycleOwner, Observer { newScore ->
-            binding.scoreText.text = newScore.toString()
-        })
+        binding.scoreViewModel = viewModel
+
+        // Specify the fragment view as the lifecycle owner of the binding.
+        // This is used so that the binding can observe LiveData updates
+        // Forgetting this seems to be a common and hard to find bug. Pay attention!
+        binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.eventPlayAgain.observe(this.viewLifecycleOwner, Observer { playAgain ->
             if (playAgain) {
@@ -70,8 +73,6 @@ class ScoreFragment : Fragment() {
                 viewModel.onPlayAgainComplete()
             }
         })
-
-        binding.playAgainButton.setOnClickListener {  viewModel.onPlayAgain()  }
 
         return binding.root
     }
